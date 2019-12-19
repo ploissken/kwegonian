@@ -8,7 +8,6 @@ networks:
 
 services:
   kwego:
-    build: .
     command: bash -c "npm install && npx gulp serve"
     networks:
       - traefik
