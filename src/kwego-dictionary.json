@@ -1,0 +1,9 @@
+{
+  "kil":  { "roman": "I", "decimal": 1 },
+  "jin":  { "roman": "V", "decimal": 5 },
+  "pol":  { "roman": "X", "decimal": 10 },
+  "kilow":  { "roman": "L", "decimal": 50 },
+  "jij":  { "roman": "C", "decimal": 100 },
+  "jinjin":  { "roman": "D", "decimal": 500 },
+  "polsx": { "roman": "M", "decimal": 1000 }
+}
