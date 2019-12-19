@@ -7,14 +7,17 @@ networks:
     external: false
 
 services:
-  kwego:
+  public_audio:
     image: node:carbon
     command: bash -c "npm install && npx gulp serve"
+    working_dir: "/home/node"
+    volumes:
+      - './:/home/node/:cached'
     networks:
       - traefik
       - internal
     labels:
-      - "traefik.backend=kwego"
+      - "traefik.backend=hfocus"
       - "traefik.docker.network=traefik"
       - "traefik.frontend.rule=Host:kwego.txto.com.br"
       - "traefik.enable=true"
