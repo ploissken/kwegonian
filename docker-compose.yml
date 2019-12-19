@@ -8,6 +8,7 @@ networks:
 
 services:
   kwego:
+    image: node:carbon
     command: bash -c "npm install && npx gulp serve"
     networks:
       - traefik
