@@ -12,7 +12,7 @@ const $log = {
 
 
 // serve posterest as static html
-// app.use(express.static('public'))
+app.use(express.static('public'))
 
 // setup routes
 $log.info('routes', 'starting')

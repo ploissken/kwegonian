@@ -28,28 +28,31 @@ module.exports = function (app, $log) {
         translated.push(translatedChar)
       }
     })
-
+    console.log('>>>>> done translating')
     // reply with a bad request if any translation error occured
     if(translationErrors.length) {
       return res.status(400)
-        .send(`unable to decode "${errorHandler.readable(translationErrors)}"`)
+        .send({ message: `unable to decode "${errorHandler.readable(translationErrors)}"` })
     }
-
+    console.log('>>>>> done checking translating errors')
     // verify and reply with bad request any numerical inconsistence
     const kwegoAsRoman = translated.map(i => i.roman).join().replace(/,/g, '')
     const inconsitenceErrors = errorHandler.sanitize(kwegoAsRoman)
     if (inconsitenceErrors.length) {
+      console.log('reporting inconsistences')
+      console.log(`numerical inconsistence(s): "${errorHandler.readable(inconsitenceErrors)}"`)
+      res.statusMessage = `numerical inconsistence(s): "${errorHandler.readable(inconsitenceErrors)}"`
       return res.status(400)
-        .send(`numerical inconsistence(s): "${errorHandler.readable(inconsitenceErrors)}"`)
+        .json({ message: `numerical inconsistence(s): "${errorHandler.readable(inconsitenceErrors)}"` })
     }
-
+    console.log('>>>>> done checking numerical inconsitenceErrors')
     // compose response
     const responseObj = {
       kwego: kwegoAlgarisms.join().replace(/,/g, ' '),
       roman: kwegoAsRoman,
       decimal: converter.kwegoToDecimals(translated.map(i => i.decimal))
     }
-
+    console.log('>>>>> done composing response')
     $log.info('routes', `translation complete`)
     $log.info('routes', `kwego: "${responseObj.kwego}"`)
     $log.info('routes', `roman: "${responseObj.roman}"`)

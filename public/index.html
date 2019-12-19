@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+      <!-- using vue, semantic ui and axios -->
+      <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+      <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+      <script type="text/javascript" src="//code.jquery.com/jquery-2.1.0.js"></script>
+      <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.1/semantic.min.js"></script>
+      <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.1/semantic.min.css">
+      <style>
+        .fade-enter-active, .fade-leave-active { transition: all .5s; }
+        .fade-enter, .fade-leave-to { opacity: 0; transform: translateY(100px); }
+      </style>
+  </head>
+
+  <body>
+    <div id="app" style="max-width: 90vw; margin: auto;">
+      <div class="ui grid">
+        <!-- padding top row -->
+        <div class="row"></div>
+
+        <!-- input row -->
+        <div class="centered row">
+          <div class="six wide column">
+            <div class="ui fluid inverted teal action input">
+              <input type="text" placeholder="digite kwegonian" v-model="kwegoInput">
+              <button class="ui basic teal button"
+                :class="{ disabled: loading }"
+                @click="handleTranslate">
+                traduzir
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- buttons row -->
+        <div class="centered row">
+          <div  class="sixteen wide center aligned column">
+            <div class="ui buttons">
+              <div v-for="alg in kwegonian"
+                @click="handleKwegoClick(alg)"
+                class="ui mini basic teal button">
+                {{ alg }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- response row -->
+        <div class="centered row">
+          <div class="six wide column">
+            <transition :duration="{ enter: 500, leave: 1000 }"
+              name="fade"
+              mode="out-in">
+              <div v-if="responseMessage" class="ui fluid left aligned teal segment">
+                <pre>{{ responseMessage }}</pre>
+              </div>
+              <div v-if="errorMessage" class="ui fluid left aligned orange segment">
+                <pre>{{ errorMessage }}</pre>
+              </div>
+            </transition>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <script>
+      new Vue({
+        el: '#app',
+        data: {
+          responseMessage: '',
+          errorMessage: '',
+          kwegoInput: '',
+          loading: false,
+          kwegonian: ["kil", "jin", "pol", "kilow", "jij", "jinjin", "polsx"]
+        },
+        methods: {
+          handleKwegoClick (kwego) {
+            this.kwegoInput = this.kwegoInput.concat(`${kwego} `)
+          },
+          handleTranslate () {
+            this.loading = true
+            this.responseMessage = this.errorMessage = ''
+            // prepare the string to the api
+            let parsed = this.kwegoInput.replace(/ /g, ',')
+            if (parsed.charAt(parsed.length - 1) === ',') {
+              parsed = parsed.slice(0, parsed.length - 1)
+            }
+
+            axios.get(`/kwego?k=${parsed}`)
+              .then(response => (this.responseMessage = JSON.stringify(response.data, 3, 3)))
+              .catch(err => { this.errorMessage = err.response.data.message })
+              .finally(() => { this.loading = false })
+          }
+        }
+      })
+    </script>
+  </body>
+</html>
