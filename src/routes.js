@@ -1,7 +1,7 @@
 
 const dictionary = require('./kwego-dictionary.json')
 const converter = require('./converter')
-const errorHandler = require('./error-handler')
+const errorParser = require('./error-parser')
 
 module.exports = function (app, $log) {
 
@@ -13,7 +13,7 @@ module.exports = function (app, $log) {
       return res.status(400).send(`no kwego received`)
     }
 
-    const kwegoAlgarisms = req.query.k.split(',')
+    const kwegoAlgarisms = req.query.k.replace(/ /g, ',').split(',')
     const translated = []
     const translationErrors = []
 
@@ -28,43 +28,35 @@ module.exports = function (app, $log) {
         translated.push(translatedChar)
       }
     })
-    console.log('>>>>> done translating')
+
     // reply with a bad request if any translation error occured
     if(translationErrors.length) {
       return res.status(400)
-        .send({ message: `unable to decode "${errorHandler.readable(translationErrors)}"` })
+        .send({ message: `unable to decode "${errorParser.readable(translationErrors)}"` })
     }
-    console.log('>>>>> done checking translating errors')
+
     // verify and reply with bad request any numerical inconsistence
     const kwegoAsRoman = translated.map(i => i.roman).join().replace(/,/g, '')
-    const inconsitenceErrors = errorHandler.sanitize(kwegoAsRoman)
-    if (inconsitenceErrors.length) {
-      console.log('reporting inconsistences')
-      console.log(`numerical inconsistence(s): "${errorHandler.readable(inconsitenceErrors)}"`)
-      res.statusMessage = `numerical inconsistence(s): "${errorHandler.readable(inconsitenceErrors)}"`
-      return res.status(400)
-        .json({ message: `numerical inconsistence(s): "${errorHandler.readable(inconsitenceErrors)}"` })
+    const inconsistenceErrors = errorParser.sanitize(kwegoAsRoman)
+    if (inconsistenceErrors.length) {
+      const errorMessage = `numerical inconsistence(s): "${errorParser.readable(inconsistenceErrors)}"`
+      $log.info('error', errorMessage)
+      return res.status(400).json({ message: errorMessage })
     }
-    console.log('>>>>> done checking numerical inconsitenceErrors')
-    // compose response
+
+    // compose and send response
     const responseObj = {
       kwego: kwegoAlgarisms.join().replace(/,/g, ' '),
       roman: kwegoAsRoman,
       decimal: converter.kwegoToDecimals(translated.map(i => i.decimal))
     }
-    console.log('>>>>> done composing response')
     $log.info('routes', `translation complete`)
-    $log.info('routes', `kwego: "${responseObj.kwego}"`)
-    $log.info('routes', `roman: "${responseObj.roman}"`)
-    $log.info('routes', `decimals: "${responseObj.decimal}"`)
-
     res.send(responseObj)
   })
 
   // catch all (404)
   app.get('*', function (req, res) {
-    $log.info('routes', '* request received')
-    res.status(404)
-      .send(`this api only responds to /kwego`)
+    $log.info('routes', `404 request received`)
+    res.status(404).send(`this api only responds to /kwego`)
   })
 }

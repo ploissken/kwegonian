@@ -1,5 +1,3 @@
-console.log('[server] hfocus starting')
-
 const PORT = process.env.PORT || 9000
 const express = require('express')
 const app = express()
@@ -10,6 +8,7 @@ const $log = {
   }
 }
 
+$log.info('server', 'starting')
 
 // serve posterest as static html
 app.use(express.static('public'))
@@ -21,7 +20,8 @@ $log.info('routes', 'setup complete')
 
 // setup weblistener
 app.listen(PORT, () => {
-  $log.info('server', `listening on port ${PORT}`)
+  $log.info('server', `setup complete`)
+  $log.info('server', `running at http://localhost:${PORT}/`)
 })
 
 // export app for eventually do tests
