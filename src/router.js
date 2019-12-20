@@ -18,7 +18,7 @@ module.exports = function (app, $log) {
 
     // send decimal or full calculation based on parameter dec
     if (req.query.dec) {
-      res.json(translated.kwegoAsDecimal)
+      res.send(translated.kwegoAsDecimal + '')
     } else {
       res.json({
         kwego: translated.kwegoToHuman,

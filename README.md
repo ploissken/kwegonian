@@ -15,7 +15,8 @@ PORT=DESIRED_PORT
 ```
 
 ## Usage
-To translate using the API via curl:
+To translate using the API, you can either access it thru
+the browser or via curl:
 ```
 curl http://localhost:9000/kwego?k=KWEGOALGARISMS
 ```
@@ -29,6 +30,13 @@ $ curl http://localhost:9000/kwego?k=kil,pol
 $ curl http://localhost:9988/kwego?k=pol%20kil%20kil
 {"kwego":"pol kil kil","roman":"XII","decimal":12}
 ```
+
+If you want only the decimals to be returned, just pass the parameter dec = 1
+```
+$ curl http://localhost:9900/kwego?k=pol%20jin%20kil&dec=1
+16
+```
+
 
 ## Test coverage
 To check test coverage, run
