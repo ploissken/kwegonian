@@ -9,16 +9,48 @@
       <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.1/semantic.min.js"></script>
       <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.1/semantic.min.css">
       <style>
-        .fade-enter-active, .fade-leave-active { transition: all .5s; }
-        .fade-enter, .fade-leave-to { opacity: 0; transform: translateY(100px); }
+        .fadeup-enter-active, .fadeup-leave-active, .fade-enter-active, .fade-leave-active { transition: all .5s; }
+        .fadeup-enter, .fadeup-leave-to { opacity: 0; transform: translateY(100px); }
+        .fade-enter, .fade-leave-to { opacity: 0; transform: translateX(100px); }
+        .app-info { position: absolute!important; width: 300px; right: 10px; z-index: 99999;}
+        .no-padding { padding: 0!important; margin: 0!important; }
       </style>
+      <title>Tradutor Kwegoniano</title>
   </head>
 
   <body>
-    <div id="app" style="max-width: 90vw; margin: auto;">
-      <div class="ui grid">
+    <div id="app" style="max-width: 100vw; margin: auto;">
+      <div class="ui grid no-padding">
+        <div class="centered row no-padding">
+          <div class="sixteen wide column no-padding">
+            <a class="ui black right corner label"
+              href="https://github.com/ploissken/kwegonian">
+              <i class="github icon"></i>
+            </a>
+          </div>
+        </div>
+
         <!-- padding top row -->
-        <div class="row"></div>
+        <div class="centered row">
+          <div class="two wide column"></div>
+          <div class="twelve wide center aligned column">
+            <h3> Tradutor Kwegonian </h3>
+          </div>
+          <div class="left aligned column" >
+            <i class="circular question mark icon"
+              @mouseover="displayInfo = true"
+              @mouseleave="displayInfo = false"> </i>
+              <transition :duration="{ enter: 500, leave: 1000 }"
+                name="fade"
+                mode="out-in">
+                <div v-if="displayInfo"
+                  class="ui teal fluid segment app-info">
+                    {{ infoMsg }}
+                </div>
+              </transition>
+          </div>
+          <div class="column"></div>
+        </div>
 
         <!-- input row -->
         <div class="centered row">
@@ -53,11 +85,18 @@
           </div>
         </div>
 
+        <!-- raw api row -->
+        <div class="centered row">
+          <div  class="sixteen wide center aligned column">
+            Acesse a api crua <a href="">aqui</a>.
+          </div>
+        </div>
+
         <!-- response row -->
         <div class="centered row">
           <div class="eight wide column">
             <transition :duration="{ enter: 500, leave: 1000 }"
-              name="fade"
+              name="fadeup"
               mode="out-in">
               <div v-if="responseMessage" class="ui fluid left aligned teal segment">
                 <div class="ui teal ribbon label">
@@ -81,11 +120,19 @@
       new Vue({
         el: '#app',
         data: {
+          displayInfo: false,
           responseMessage: '',
           errorMessage: '',
           kwegoInput: '',
           loading: false,
           kwegonian: ["kil", "jin", "pol", "kilow", "jij", "jinjin", "polsx"].reverse()
+        },
+        computed: {
+          infoMsg () {
+            return 'Cliente amigável para o consumo da API tradutora de Kwegoniano. ' +
+              'Ao clicar no botão traduzir, o input em kwegonian digitado é enviado ao servidor para ser traduzido. ' +
+              'A resposta do servidor contém as traduções para romano e decimal. '
+          }
         },
         methods: {
           handleKwegoClick (kwego) {

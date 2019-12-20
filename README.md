@@ -36,10 +36,3 @@ If you want only the decimals to be returned, just pass the parameter dec = 1
 $ curl http://localhost:9900/kwego?k=pol%20jin%20kil&dec=1
 16
 ```
-
-
-## Test coverage
-To check test coverage, run
-```
-npm run test
-```
