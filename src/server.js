@@ -13,10 +13,10 @@ $log.info('server', 'starting')
 // serve posterest as static html
 app.use(express.static('public'))
 
-// setup routes
-$log.info('routes', 'starting')
-require('./routes')(app, $log)
-$log.info('routes', 'setup complete')
+// setup router
+$log.info('router', 'starting')
+require('./router')(app, $log)
+$log.info('router', 'setup complete')
 
 // setup weblistener
 app.listen(PORT, () => {

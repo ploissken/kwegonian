@@ -12,7 +12,7 @@ module.exports = {
     return inconsistencesFound
   },
 
-  readable: function (errorsArray) {
-    return errorsArray.join().replace(/,/g, ', ')
+  parseToHuman: function (array) {
+    return array.join().replace(/,/g, ', ')
   }
 }

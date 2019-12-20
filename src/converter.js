@@ -1,6 +1,84 @@
+const dictionary = require('./kwego-dictionary.json')
+const tools = require('./tools')
 
 module.exports = {
-  kwegoToDecimals: function (kwegoAsDecimal) {
+  // verify roman string inconsistence
+  validateRoman: function (translatedKwego) {
+    // TODO: there are still many inconsistences to be catpured here
+    const inconsistences = [ 'IIII', 'VV', 'XXXX', 'LL', 'CCCC', 'DD' ]
+
+    const kwegoAsRoman = translatedKwego.map(i => i.roman).join().replace(/,/g, '')
+
+    const inconsistenceErrors = inconsistences.map(inc => {
+      return kwegoAsRoman.includes(inc) ? inc : false
+    }).filter(Boolean)
+
+    if (inconsistenceErrors.length) {
+      return {
+        status: 'error',
+        message: `roman inconsistence(s) found: "${tools.parseToHuman(inconsistenceErrors)}"`
+      }
+    }
+
+    return {
+      status: 'success',
+      data: kwegoAsRoman
+    }
+  },
+
+  // tries to translate a kwego input
+  translateKwego: function (kwegoInput) {
+    if(!kwegoInput) {
+      return {
+        status: 'error',
+        message: `no kwego received`
+      }
+    }
+
+    const kwegoAlgarisms = kwegoInput.replace(/ /g, ',').split(',')
+    const translated = []
+    const translationErrors = []
+
+    kwegoAlgarisms.forEach(algarism => {
+      const translatedChar = dictionary[algarism.toLowerCase()]
+
+      if (!translatedChar) {
+        // save occurences of unknown algarisms
+        translationErrors.push(algarism)
+      } else {
+        translated.push(translatedChar)
+      }
+    })
+
+    if(translationErrors.length) {
+      return {
+        status: 'error',
+        message: `unable to decode "${tools.parseToHuman(translationErrors)}"`
+      }
+    }
+
+    const romanValidation = this.validateRoman(translated)
+    if(romanValidation.status === `error`) {
+      return romanValidation
+    }
+
+
+    // return the translated kwego array
+    return {
+      status: 'success',
+      data: translated,
+      kwegoToHuman: kwegoAlgarisms.join().replace(/,/g, ' '),
+      kwegoAsRoman: romanValidation.data,
+      kwegoAsDecimal: this.romanToDecimals(translated)
+    }
+  },
+
+
+
+  // converts to decimal an array of roman algarisms, represented as decimals
+  // (X = 10, I = 1, V = 5 ...)
+  romanToDecimals: function (translated) {
+    const kwegoAsDecimal = translated.map(i => i.decimal)
     let comparingNumber = kwegoAsDecimal.shift()
 
     // if we have a single algarism, the job is done
