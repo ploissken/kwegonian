@@ -16,15 +16,20 @@ module.exports = function (app, $log) {
 
     $log.info('routes', `translation complete`)
 
-    // send decimal or full calculation based on parameter dec
+    const result = {
+      kwego: translated.kwegoToHuman,
+      roman: translated.kwegoAsRoman,
+      decimal: translated.kwegoAsDecimal
+    }
+
+    $log.info('routes', JSON.stringify(result))
+
     if (req.query.dec) {
+      // send decimals only
       res.send(translated.kwegoAsDecimal + '')
     } else {
-      res.json({
-        kwego: translated.kwegoToHuman,
-        roman: translated.kwegoAsRoman,
-        decimal: translated.kwegoAsDecimal
-      })
+      // send full calculation results
+      res.json(result)
     }
   })
 

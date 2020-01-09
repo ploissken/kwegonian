@@ -8,13 +8,13 @@ const $log = {
   }
 }
 
-$log.info('server', 'starting')
+$log.info('server', 'starting setup')
 
-// serve posterest as static html
+// serve public folder as static html
 app.use(express.static('public'))
 
 // setup router
-$log.info('router', 'starting')
+$log.info('router', 'starting setup')
 require('./router')(app, $log)
 $log.info('router', 'setup complete')
 

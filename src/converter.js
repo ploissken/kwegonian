@@ -1,7 +1,11 @@
 const dictionary = require('./kwego-dictionary.json')
-const tools = require('./tools')
 
 module.exports = {
+  // makes a readable version of
+  parseToHuman: function (array) {
+    return array.join().replace(/,/g, ', ')
+  },
+
   // verify roman string inconsistence
   validateRoman: function (translatedKwego) {
     // TODO: there are still many inconsistences to be catpured here
@@ -16,7 +20,7 @@ module.exports = {
     if (inconsistenceErrors.length) {
       return {
         status: 'error',
-        message: `roman inconsistence(s) found: "${tools.parseToHuman(inconsistenceErrors)}"`
+        message: `roman inconsistence(s) found: "${this.parseToHuman(inconsistenceErrors)}"`
       }
     }
 
@@ -50,18 +54,19 @@ module.exports = {
       }
     })
 
+    // abort if any translation problem occured
     if(translationErrors.length) {
       return {
         status: 'error',
-        message: `unable to decode "${tools.parseToHuman(translationErrors)}"`
+        message: `unable to decode "${this.parseToHuman(translationErrors)}"`
       }
     }
 
+    // abort if roman version is inconsistent
     const romanValidation = this.validateRoman(translated)
     if(romanValidation.status === `error`) {
       return romanValidation
     }
-
 
     // return the translated kwego array
     return {
@@ -72,8 +77,6 @@ module.exports = {
       kwegoAsDecimal: this.romanToDecimals(translated)
     }
   },
-
-
 
   // converts to decimal an array of roman algarisms, represented as decimals
   // (X = 10, I = 1, V = 5 ...)
