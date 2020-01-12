@@ -15,6 +15,9 @@ module.exports = {
 
     return {
       status: inconsistences.length > 0 ? 'warning' : 'success',
+      message: inconsistences.length > 0
+        ? `${kwegoAsRoman} seens odd. It can probably be written in a better way.` 
+        : '',
       data: kwegoAsRoman
     }
   },
@@ -56,6 +59,7 @@ module.exports = {
     // return the translated kwego array
     return {
       status: romanValidation.status,
+      message: romanValidation.message,
       kwego: kwegoAlgarisms.join().replace(/,/g, ' '),
       roman: romanValidation.data,
       decimal: this.romanToDecimals(translated)
