@@ -71,10 +71,9 @@ module.exports = {
     // return the translated kwego array
     return {
       status: 'success',
-      data: translated,
-      kwegoToHuman: kwegoAlgarisms.join().replace(/,/g, ' '),
-      kwegoAsRoman: romanValidation.data,
-      kwegoAsDecimal: this.romanToDecimals(translated)
+      kwego: kwegoAlgarisms.join().replace(/,/g, ' '),
+      roman: romanValidation.data,
+      decimal: this.romanToDecimals(translated)
     }
   },
 
