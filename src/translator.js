@@ -6,26 +6,15 @@ module.exports = {
     return array.join().replace(/,/g, ', ')
   },
 
-  // verify roman string inconsistence
+  // verify and warn roman string for inconsistences
+  // about the regex: http://bit.ly/2tNzbaV
   validateRoman: function (translatedKwego) {
-    // TODO: there are still many inconsistences to be catpured here
-    const inconsistences = [ 'IIII', 'VV', 'XXXX', 'LL', 'CCCC', 'DD' ]
-
     const kwegoAsRoman = translatedKwego.map(i => i.roman).join().replace(/,/g, '')
-
-    const inconsistenceErrors = inconsistences.map(inc => {
-      return kwegoAsRoman.includes(inc) ? inc : false
-    }).filter(Boolean)
-
-    if (inconsistenceErrors.length) {
-      return {
-        status: 'error',
-        message: `roman inconsistence(s) found: "${this.parseToHuman(inconsistenceErrors)}"`
-      }
-    }
+    const inconsistences = kwegoAsRoman
+      .replace(/M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$/, '')
 
     return {
-      status: 'success',
+      status: inconsistences.length > 0 ? 'warning' : 'success',
       data: kwegoAsRoman
     }
   },
@@ -62,15 +51,11 @@ module.exports = {
       }
     }
 
-    // abort if roman version is inconsistent
     const romanValidation = this.validateRoman(translated)
-    if(romanValidation.status === `error`) {
-      return romanValidation
-    }
 
     // return the translated kwego array
     return {
-      status: 'success',
+      status: romanValidation.status,
       kwego: kwegoAlgarisms.join().replace(/,/g, ' '),
       roman: romanValidation.data,
       decimal: this.romanToDecimals(translated)
@@ -109,7 +94,7 @@ module.exports = {
     		sum += (nextNumber - comparingNumber)
 
     		// if there's just one more number left, add it to the total and we are done
-    		if ((i + 2) == numbersToCompare && numbersToCompare == 1) {
+    		if ((i + 2) == numbersToCompare) {
     			comparingNumber = kwegoAsDecimal.shift()
     			sum += comparingNumber
     		}
