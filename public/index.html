@@ -49,13 +49,14 @@
                 ref="kInput"
                 v-model="kwegoInput">
               <i v-if="kwegoInput" class="circular cancel icon"
-                @click="kwegoInput = responseMessage = ''"></i>
+                :tabindex="2"
+                @click="handleClear"></i>
             </div>
           </div>
           <div class="two wide computer tablet four wide mobile column">
             <button class="ui fluid teal button"
               :class="{ disabled: loading }"
-              :tabindex="2"
+              :tabindex="3"
               @click="handleTranslate">
               translate
             </button>
@@ -67,7 +68,7 @@
           <div  class="ten wide computer tablet fourteen wide mobile center aligned column">
             <div class="ui seven small buttons">
               <button v-for="(alg, index) in kwegonian"
-                :tabindex="index + 3"
+                :tabindex="index + 4"
                 @click="handleKwegoClick(alg)"
                 class="ui mini teal button">
                 {{ alg }}
@@ -115,7 +116,6 @@
       new Vue({
         el: '#app',
         data: {
-          displayInfo: false,
           responseMessage: '',
           kwegoInput: '',
           loading: false,
@@ -124,6 +124,10 @@
         methods: {
           handleKwegoClick (kwego) {
             this.kwegoInput = this.kwegoInput.concat(`${kwego} `)
+          },
+          handleClear () {
+            this.kwegoInput = this.responseMessage = ''
+            this.loading = false
           },
           handleTranslate () {
             this.loading = true
