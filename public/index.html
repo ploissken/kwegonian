@@ -9,18 +9,20 @@
       <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.1/semantic.min.js"></script>
       <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.1/semantic.min.css">
       <style>
-        .fadeup-enter-active, .fadeup-leave-active, .fade-enter-active, .fade-leave-active { transition: all .5s; }
+        .fadeup-enter-active, .fadeup-leave-active { transition: all .5s; }
         .fadeup-enter, .fadeup-leave-to { opacity: 0; transform: translateY(100px); }
         .fade-enter, .fade-leave-to { opacity: 0; transform: translateX(100px); }
         .app-info { position: absolute!important; width: 300px; right: 10px; z-index: 99999;}
         .no-padding { padding: 0!important; margin: 0!important; }
       </style>
-      <title>Tradutor Kwegoniano</title>
+      <title>Kwegonian Translator</title>
   </head>
 
   <body>
     <div id="app" style="max-width: 100vw; margin: auto;">
-      <div class="ui grid no-padding">
+      <div class="ui grid container no-padding">
+
+        <!-- github row -->
         <div class="centered row no-padding">
           <div class="sixteen wide column no-padding">
             <a class="ui black right corner label"
@@ -30,51 +32,40 @@
           </div>
         </div>
 
-        <!-- padding top row -->
+        <!-- title row -->
         <div class="centered row">
-          <div class="two wide column"></div>
-          <div class="twelve wide center aligned column">
-            <h3> Tradutor Kwegonian </h3>
+          <div class="ten wide computer tablet fourteen wide mobile column">
+            <h3> Kwegonian Translator </h3>
           </div>
-          <div class="left aligned column" >
-            <i class="circular question mark icon"
-              @mouseover="displayInfo = true"
-              @mouseleave="displayInfo = false"> </i>
-              <transition :duration="{ enter: 500, leave: 1000 }"
-                name="fade"
-                mode="out-in">
-                <div v-if="displayInfo"
-                  class="ui teal fluid segment app-info">
-                    {{ infoMsg }}
-                </div>
-              </transition>
-          </div>
-          <div class="column"></div>
         </div>
 
         <!-- input row -->
         <div class="centered row">
-          <div class="ten wide column">
-            <div class="ui fluid inverted teal action input">
+          <div class="eight wide computer tablet ten wide mobile column">
+            <div class="ui fluid icon inverted teal input">
               <input type="text"
                 placeholder="digite kwegonian ou utilize o teclado"
                 :tabindex="1"
                 ref="kInput"
                 v-model="kwegoInput">
-              <button class="ui teal button"
-                :class="{ disabled: loading }"
-                :tabindex="2"
-                @click="handleTranslate">
-                traduzir
-              </button>
+              <i v-if="kwegoInput" class="circular cancel icon"
+                @click="kwegoInput = responseMessage = ''"></i>
             </div>
+          </div>
+          <div class="two wide computer tablet four wide mobile column">
+            <button class="ui fluid teal button"
+              :class="{ disabled: loading }"
+              :tabindex="2"
+              @click="handleTranslate">
+              translate
+            </button>
           </div>
         </div>
 
         <!-- buttons row -->
         <div class="centered row">
-          <div  class="sixteen wide center aligned column">
-            <div class="ui small buttons">
+          <div  class="ten wide computer tablet fourteen wide mobile center aligned column">
+            <div class="ui seven small buttons">
               <button v-for="(alg, index) in kwegonian"
                 :tabindex="index + 3"
                 @click="handleKwegoClick(alg)"
@@ -87,25 +78,36 @@
 
         <!-- response row -->
         <div class="centered row">
-          <div class="eight wide column">
+          <div class="ten wide computer tablet fourteen wide mobile column">
             <transition :duration="{ enter: 500, leave: 1000 }"
               name="fadeup"
               mode="out-in">
-              <div v-if="responseMessage" class="ui fluid left aligned teal segment">
-                <div class="ui teal ribbon label">
-                  {{ responseMessage.kwego }}
+              <div v-if="responseMessage" class="ui fluid segment"
+                :class="`${ responseMessage.status === 'success' ? 'teal' : 'orange' }`">
+                <div class="ui ribbon label">
+                  <i class="icon"
+                    :class="`${ responseMessage.status === 'success' ? 'teal check circle' : 'orange warning circle' }`"></i>
+                    {{ responseMessage.status === 'error' ? 'error' : `kwego: ${responseMessage.kwego}` }}
                 </div>
-                <h2 class="ui right floated header">{{ responseMessage.decimal }}</h2>
                 <div class="ui clearing divider"></div>
-                <p>{{ responseMessage.roman }}</p>
-              </div>
-              <div v-if="errorMessage" class="ui fluid left aligned orange segment">
-                {{ errorMessage }}
+                <div class="ui basic fluid center aligned segment">
+                  <div v-if="responseMessage.status !== 'error'" class="ui center aligned statistic">
+                    <div class="value"> {{ responseMessage.decimal }} </div>
+                    <div class="label"> roman: {{ responseMessage.roman }} </div>
+                  </div>
+                  <div v-else class="ui basic fluid center segment">
+                    {{ responseMessage.message }}
+                  </div>
+                </div>
+                <div v-if="responseMessage.status === 'warning'" class="ui bottom attached label">
+                  <i class="icon"
+                    :class="`${ responseMessage.status === 'success' ? 'teal check circle' : 'orange warning circle' }`"></i>
+                    {{ responseMessage.message }}
+                </div>
               </div>
             </transition>
           </div>
         </div>
-
       </div>
     </div>
 
@@ -115,17 +117,9 @@
         data: {
           displayInfo: false,
           responseMessage: '',
-          errorMessage: '',
           kwegoInput: '',
           loading: false,
           kwegonian: ["kil", "jin", "pol", "kilow", "jij", "jinjin", "polsx"].reverse()
-        },
-        computed: {
-          infoMsg () {
-            return 'Cliente amigável para o consumo da API tradutora de Kwegoniano. ' +
-              'Ao clicar no botão traduzir, o input em kwegonian digitado é enviado ao servidor para ser traduzido. ' +
-              'A resposta do servidor contém as traduções para romano e decimal. '
-          }
         },
         methods: {
           handleKwegoClick (kwego) {
@@ -133,7 +127,6 @@
           },
           handleTranslate () {
             this.loading = true
-            this.responseMessage = this.errorMessage = ''
             // prepare the string to the api
             let parsed = this.kwegoInput.replace(/ /g, ',')
             if (parsed.charAt(parsed.length - 1) === ',') {
@@ -141,7 +134,7 @@
             }
             axios.get(`/kwego?k=${parsed}`)
               .then(response => (this.responseMessage = response.data))
-              .catch(err => { this.errorMessage = err.response.data.message })
+              .catch(err => { this.responseMessage = err.response.data })
               .finally(() => { this.loading = false })
           }
         },
