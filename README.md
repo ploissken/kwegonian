@@ -18,6 +18,10 @@ containing:
 ```
 PORT=DESIRED_PORT
 ```
+## Deploying with docker
+Included in the source is a docker-compose, for easy deploying the app.
+This docker-compose is the same that runs the [currently deployed sample](https://kwego.txto.com.br). To
+correctly doing so, [this traefik image](https://github.com/ploissken/traefik) is necessary to routes subdomains and add SSL certificates.
 
 ## Structure
 ```
