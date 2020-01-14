@@ -30,21 +30,6 @@ const translator = require('../src/translator.js')
       expect(result.message).to.equal('unable to decode "jong, un, pow"')
       done()
     })
-
-    it('should warn if roman inconsistences are detected', function (done) {
-      let result = translator.translateKwego('kil,kil,kil,kil,pol,jinjin,jinjin')
-      expect(result.status).to.equal('warning')
-      expect(result.roman).to.equal('IIIIXDD')
-
-      result = translator.translateKwego('kil,pol,pol')
-      expect(result.status).to.equal('warning')
-      expect(result.roman).to.equal('IXX')
-
-      result = translator.translateKwego('kil kil jin pol kil jin')
-      expect(result.status).to.equal('warning')
-      expect(result.roman).to.equal('IIVXIV')
-      done()
-    })
   })
 
   describe('translation capabilities', function () {

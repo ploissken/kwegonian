@@ -10,14 +10,14 @@ module.exports = {
   // about the regex: http://bit.ly/2tNzbaV
   validateRoman: function (translatedKwego) {
     const kwegoAsRoman = translatedKwego.map(i => i.roman).join().replace(/,/g, '')
-    const inconsistences = kwegoAsRoman
-      .replace(/M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$/, '')
+    // const inconsistences = kwegoAsRoman
+    //   .replace(/M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$/, '')
 
     return {
-      status: inconsistences.length > 0 ? 'warning' : 'success',
-      message: inconsistences.length > 0
-        ? `${kwegoAsRoman} seens odd. It can probably be written in a better way.` 
-        : '',
+      status: 'success',
+      // message: inconsistences.length > 0
+      //   ? `${kwegoAsRoman} seens odd. It can probably be written in a better way.`
+      //   : '',
       data: kwegoAsRoman
     }
   },
@@ -69,50 +69,30 @@ module.exports = {
   // converts to decimal an array of roman algarisms, represented as decimals
   // (X = 10, I = 1, V = 5 ...)
   romanToDecimals: function (translated) {
-    const kwegoAsDecimal = translated.map(i => i.decimal)
-    let comparingNumber = kwegoAsDecimal.shift()
+    const romanAsDecimal = translated.map(i => i.decimal).reverse()
 
     // if we have a single algarism, the job is done
-    if (!kwegoAsDecimal.length) return comparingNumber
+    if (romanAsDecimal.length === 1) return romanAsDecimal[0]
 
     let sum = 0
-    let nextNumber = 0
-    let numbersToCompare = kwegoAsDecimal.length
 
-    for (let i = 0; i < numbersToCompare; i++) {
-    	nextNumber = kwegoAsDecimal[0]
+    for (let i = 0; i < romanAsDecimal.length; i++) {
+      const comparingN = romanAsDecimal[i]
 
-    	if (comparingNumber >= nextNumber) {
-    		// first number is greater, sum it up and keep going
-    		sum += comparingNumber
-    		comparingNumber = kwegoAsDecimal.shift()
-
-        // if the next comparingNumber is the last algarism,
-        // we add it to the sum
-    		if ((i + 1) == numbersToCompare) {
-    			sum += comparingNumber
-    		}
-    	} else {
-        // when nextNumber is greater than comparingNumber,
-        // its a subtraction operation. we sum the difference
-    		sum += (nextNumber - comparingNumber)
-
-    		// if there's just one more number left, add it to the total and we are done
-    		if ((i + 2) == numbersToCompare) {
-    			comparingNumber = kwegoAsDecimal.shift()
-    			sum += comparingNumber
-    		}
-
-        // if there's more than one number left,
-        // we start again
-    		if ((i + 2) < numbersToCompare) {
-    			comparingNumber = kwegoAsDecimal.shift()
-    		}
-
-        // and since we joined two algarisms in one,
-    		// we add one to the counter
-    		i++
-    	}
+      // if not the last N
+      if ((i + 1) < romanAsDecimal.length) {
+        const nextN = romanAsDecimal[i + 1]
+        if(comparingN > nextN) {
+          //subtract
+          sum += (comparingN - nextN)
+          i++
+        } else {
+          // sum
+          sum += comparingN
+        }
+      } else {
+        sum += comparingN
+      }
     }
 
     return sum
